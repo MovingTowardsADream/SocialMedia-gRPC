@@ -1,0 +1,11 @@
+grpc:
+  port: 8000
+  timeout: 5s
+  token_ttl: 1h
+
+db:
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  name: "postgres"
+  ssl_mode: "disable"
