@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	Env  string     `yaml:"env" env-default:"local"`
 	GRPC GRPCConfig `yaml:"grpc"`
 	DB   DBConfig   `yaml:"db"`
 }
@@ -27,7 +28,7 @@ type DBConfig struct {
 }
 
 func OpenConfig() *Config {
-	path := GetConfigPath()
+	path := getConfigPath()
 	if path == "" {
 		panic("config path is empty")
 	}
@@ -44,7 +45,7 @@ func OpenConfig() *Config {
 	return &cfg
 }
 
-func GetConfigPath() string {
+func getConfigPath() string {
 	var res string
 
 	flag.StringVar(&res, "config", "./configs/config.yaml", "path to config file")

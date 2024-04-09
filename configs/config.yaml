@@ -1,3 +1,5 @@
+env: "local"
+
 grpc:
   port: 8000
   timeout: 5s
