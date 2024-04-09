@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"os"
+	"test-gRPC/internal/app"
 	"test-gRPC/internal/read_config"
 )
 
@@ -17,7 +18,9 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	log.Info("starting application")
+	application := app.New(log, cfg.GRPC.Port, cfg.GRPC.TokenTLL)
+
+	application.GRPCSrv.MustRun()
 }
 
 func setupLogger(env string) *slog.Logger {
