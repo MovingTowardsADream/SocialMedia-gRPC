@@ -3,6 +3,8 @@ package main
 import (
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 	"test-gRPC/internal/app"
 	"test-gRPC/internal/read_config"
 )
@@ -18,9 +20,20 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
+	log.Info("Application started")
 	application := app.New(log, cfg.GRPC.Port, cfg.GRPC.TokenTLL)
 
-	application.GRPCSrv.MustRun()
+	go func() {
+		application.GRPCSrv.MustRun()
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	log.Info("Application shutting down")
+	application.GRPCSrv.Stop()
+	log.Info("Application successfully closed")
 }
 
 func setupLogger(env string) *slog.Logger {
