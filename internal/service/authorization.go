@@ -38,6 +38,11 @@ func (a *Auth) CreateUser(ctx context.Context, user entity.User) (int64, error) 
 }
 
 func (a *Auth) GenerateToken(ctx context.Context, email, password string) (string, error) {
+	user, err := a.usrProc.GetUser(ctx, email, generatePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(user.Id)
 	return "", nil
 }
 

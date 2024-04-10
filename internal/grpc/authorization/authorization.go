@@ -49,7 +49,7 @@ func (s *serverAPI) SignUp(ctx context.Context, req *ssov1.SignUpRequest) (*ssov
 
 type signInInput struct {
 	Email    string `protobuf:"bytes,1,opt,name=email"`
-	Password string `protobuf:"bytes,1,opt,name=password"`
+	Password string `protobuf:"bytes,2,opt,name=password"`
 }
 
 func (i *signInInput) Reset()         { *i = signInInput{} }
@@ -67,7 +67,6 @@ func (s *serverAPI) SignIn(ctx context.Context, req *ssov1.SignInRequest) (*ssov
 	if err != nil {
 		return nil, err
 	}
-
 	token, err := s.auth.GenerateToken(ctx, input.Email, input.Password)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
