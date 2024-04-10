@@ -4,15 +4,23 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"test-gRPC/entity"
 	ssov1 "test-gRPC/protobuf"
 )
 
-type serverAPI struct {
-	ssov1.UnimplementedTwitListServer
+type ListTwit interface {
+	CreateTwit(ctx context.Context, twit entity.Twit) (int64, error)
+	GetTwit(ctx context.Context, email, password string) (string, error)
+	DeleteTwit(ctx context.Context, email, password string) (string, error)
 }
 
-func TwitList(gRPC *grpc.Server) {
-	ssov1.RegisterTwitListServer(gRPC, &serverAPI{})
+type serverAPI struct {
+	ssov1.UnimplementedTwitListServer
+	listTwit ListTwit
+}
+
+func TwitList(gRPC *grpc.Server, listTwit ListTwit) {
+	ssov1.RegisterTwitListServer(gRPC, &serverAPI{listTwit: listTwit})
 }
 
 func (s *serverAPI) CreateTwit(ctx context.Context, req *ssov1.CreateTwitRequest) (*ssov1.Message, error) {
