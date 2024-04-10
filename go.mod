@@ -11,7 +11,9 @@ require (
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

@@ -1,40 +1,34 @@
 package postgres
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
-	"test-gRPC/entity"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
-type Storage struct {
-	db *sql.DB
+type Config struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSLMode  string
 }
 
-func New(storagePath string) (*Storage, error) {
-	const op = "storage.sqlite.New"
+type Storage struct {
+	db *sqlx.DB
+}
 
-	db, err := sql.Open("sqlite3", storagePath)
+func NewPostgresDB(cfg Config) (*Storage, error) {
+	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
 	}
 
 	return &Storage{db: db}, nil
-}
-
-func (s *Storage) CreateUser(ctx context.Context, email string, passHash []byte) (int64, error) {
-	return 1, nil
-}
-func (s *Storage) GetUser(ctx context.Context, email, password string) (entity.User, error) {
-	return entity.User{}, nil
-}
-
-func (s *Storage) CreateTwit(ctx context.Context, twit entity.Twit) (int64, error) {
-	return 1, nil
-}
-func (s *Storage) GetTwit(ctx context.Context, email, password string) (string, error) {
-	return "", nil
-}
-func (s *Storage) DeleteTwit(ctx context.Context, email, password string) (string, error) {
-	return "", nil
 }

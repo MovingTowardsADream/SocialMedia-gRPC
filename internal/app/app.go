@@ -13,8 +13,15 @@ type App struct {
 }
 
 func New(log *slog.Logger, grpcPort int, tokenTLL time.Duration) *App {
-	storage, _ := postgres.New("")
-
+	cfg := postgres.Config{
+		Host:     "localhost",
+		Port:     "5432",
+		Username: "postgres",
+		Password: "qwerty",
+		DBName:   "postgres",
+		SSLMode:  "disable",
+	}
+	storage, _ := postgres.NewPostgresDB(cfg)
 	authService := service.NewAuth(log, storage, tokenTLL)
 	twitsService := service.NewListTwit(log, storage)
 	grpcApp := grpcapp.New(log, authService, twitsService, grpcPort)
