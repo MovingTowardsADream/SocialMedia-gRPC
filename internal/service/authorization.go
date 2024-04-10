@@ -4,14 +4,22 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"log/slog"
 	"test-gRPC/entity"
 	"time"
 )
 
 const (
-	salt = "f9uuruefje3"
+	salt       = "f9uuruefje3"
+	signingKey = "opofpajdskvisvieorfd"
+	tokenTTL   = 12 * time.Hour
 )
+
+type tokenClaims struct {
+	jwt.StandardClaims
+	UserId int `json:"user_id"`
+}
 
 type Auth struct {
 	log      *slog.Logger
@@ -42,8 +50,14 @@ func (a *Auth) GenerateToken(ctx context.Context, email, password string) (strin
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(user.Id)
-	return "", nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		int(user.Id),
+	})
+	return token.SignedString([]byte(signingKey))
 }
 
 func generatePasswordHash(password string) string {
