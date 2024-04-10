@@ -20,10 +20,11 @@ type GRPCConfig struct {
 }
 
 type DBConfig struct {
-	Host     string `yaml:"localhost"`
+	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	UserName string `yaml:"username"`
 	Name     string `yaml:"name"`
+	Password string `yaml:"password"`
 	SSLMode  string `yaml:"ssl_mode"`
 }
 

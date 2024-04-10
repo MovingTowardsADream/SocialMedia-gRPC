@@ -21,7 +21,8 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	log.Info("Application started")
-	application := app.New(log, cfg.GRPC.Port, cfg.GRPC.TokenTLL)
+
+	application := app.New(log, *cfg)
 
 	go func() {
 		application.GRPCSrv.MustRun()
