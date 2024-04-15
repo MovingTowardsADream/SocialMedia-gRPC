@@ -33,7 +33,7 @@ func main() {
 	<-quit
 
 	log.Info("Application shutting down")
-	application.GRPCSrv.Stop()
+	application.GRPCSrv.Shutdown()
 	log.Info("Application successfully closed")
 }
 

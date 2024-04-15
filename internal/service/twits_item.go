@@ -12,9 +12,9 @@ type ListTwit struct {
 }
 
 type TwitProcedure interface {
-	CreateTwit(ctx context.Context, twit entity.Twit) (int64, error)
-	GetTwit(ctx context.Context, email, password string) (string, error)
-	DeleteTwit(ctx context.Context, email, password string) (string, error)
+	CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error)
+	GetTwit(ctx context.Context, twitId int64, userId int) (string, error)
+	DeleteTwit(ctx context.Context, twitId int64, userId int) error
 }
 
 func NewListTwit(log *slog.Logger, twtProc TwitProcedure) *ListTwit {
@@ -24,12 +24,12 @@ func NewListTwit(log *slog.Logger, twtProc TwitProcedure) *ListTwit {
 	}
 }
 
-func (a *ListTwit) CreateTwit(ctx context.Context, twit entity.Twit) (int64, error) {
-	return 1, nil
+func (a *ListTwit) CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error) {
+	return a.twtProc.CreateTwit(ctx, twit, userId)
 }
-func (a *ListTwit) GetTwit(ctx context.Context, email, password string) (string, error) {
-	return "", nil
+func (a *ListTwit) GetTwit(ctx context.Context, twitId int64, userId int) (string, error) {
+	return a.twtProc.GetTwit(ctx, twitId, userId)
 }
-func (a *ListTwit) DeleteTwit(ctx context.Context, email, password string) (string, error) {
-	return "", nil
+func (a *ListTwit) DeleteTwit(ctx context.Context, twitId int64, userId int) error {
+	return a.twtProc.DeleteTwit(ctx, twitId, userId)
 }

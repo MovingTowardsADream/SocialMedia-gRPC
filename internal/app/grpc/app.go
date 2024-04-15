@@ -52,7 +52,7 @@ func (a *App) Run() error {
 	return nil
 }
 
-func (a *App) Stop() {
+func (a *App) Shutdown() {
 	a.log.Info("Stopping gRPC server")
 
 	a.gRPCServer.GracefulStop()

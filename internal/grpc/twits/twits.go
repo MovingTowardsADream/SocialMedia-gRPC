@@ -3,19 +3,22 @@ package twits
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+	"strconv"
 	"strings"
 	"test-gRPC/entity"
 	ssov1 "test-gRPC/protobuf"
 )
 
 type ListTwit interface {
-	CreateTwit(ctx context.Context, twit entity.Twit) (int64, error)
-	GetTwit(ctx context.Context, email, password string) (string, error)
-	DeleteTwit(ctx context.Context, email, password string) (string, error)
+	CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error)
+	GetTwit(ctx context.Context, twitId int64, userId int) (string, error)
+	DeleteTwit(ctx context.Context, twitId int64, userId int) error
 }
 
 type serverAPI struct {
@@ -32,22 +35,77 @@ func (s *serverAPI) CreateTwit(ctx context.Context, req *ssov1.CreateTwitRequest
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(userId)
+	var input entity.Twit
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	err = proto.Unmarshal(data, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := s.listTwit.CreateTwit(ctx, input, userId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
 	return &ssov1.Message{
-		Message: string(userId),
+		Message: "Successfully added. Id: " + strconv.Itoa(int(id)),
 	}, nil
 }
 
 func (s *serverAPI) GetTwit(ctx context.Context, req *ssov1.GetTwitRequest) (*ssov1.Message, error) {
+	userId, err := userIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var input entity.Twit
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = proto.Unmarshal(data, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	l, err := s.listTwit.GetTwit(ctx, input.Id, userId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
 	return &ssov1.Message{
-		Message: "dsds2",
+		Message: l,
 	}, nil
 }
 
 func (s *serverAPI) DeleteTwit(ctx context.Context, req *ssov1.DeleteTwitRequest) (*ssov1.Message, error) {
-	fmt.Println(int(req.TwitId))
+	userId, err := userIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var input entity.Twit
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = proto.Unmarshal(data, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.listTwit.DeleteTwit(ctx, input.Id, userId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
 	return &ssov1.Message{
-		Message: "dsds3",
+		Message: "Successfully delete",
 	}, nil
 }
 
