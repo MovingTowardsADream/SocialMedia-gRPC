@@ -2,6 +2,7 @@ package app
 
 import (
 	"log/slog"
+	"strconv"
 	grpcapp "test-gRPC/internal/app/grpc"
 	"test-gRPC/internal/read_config"
 	"test-gRPC/internal/service"
@@ -15,7 +16,7 @@ type App struct {
 func New(log *slog.Logger, config read_config.Config) *App {
 	cfg := postgres.Config{
 		Host:     config.DB.Host,
-		Port:     "5432",
+		Port:     strconv.Itoa(config.DB.Port),
 		Username: config.DB.UserName,
 		Password: config.DB.Password,
 		DBName:   config.DB.Name,
