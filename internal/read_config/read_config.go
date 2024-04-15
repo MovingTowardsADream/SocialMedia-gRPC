@@ -14,9 +14,8 @@ type Config struct {
 }
 
 type GRPCConfig struct {
-	Port     int           `yaml:"port"`
-	TimeOut  time.Duration `yaml:"timeout"`
-	TokenTLL time.Duration `yaml:"token_tll"`
+	Port    int           `yaml:"port"`
+	TimeOut time.Duration `yaml:"timeout"`
 }
 
 type DBConfig struct {

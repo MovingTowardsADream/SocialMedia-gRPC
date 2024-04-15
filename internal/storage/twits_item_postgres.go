@@ -3,10 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"test-gRPC/entity"
+	ssov1 "test-gRPC/protobuf"
 )
 
-func (s *Storage) CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error) {
+func (s *Storage) CreateTwit(ctx context.Context, twit ssov1.CreateTwitRequest, userId int) (int64, error) {
 	var id int64
 
 	createListQuery := fmt.Sprintf("INSERT INTO %s (twit, user_id) VALUES ($1, $2) RETURNING id", twitsTable)

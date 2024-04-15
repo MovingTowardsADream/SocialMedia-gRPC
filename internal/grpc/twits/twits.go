@@ -11,12 +11,11 @@ import (
 	"google.golang.org/grpc/status"
 	"strconv"
 	"strings"
-	"test-gRPC/entity"
 	ssov1 "test-gRPC/protobuf"
 )
 
 type ListTwit interface {
-	CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error)
+	CreateTwit(ctx context.Context, twit ssov1.CreateTwitRequest, userId int) (int64, error)
 	GetTwit(ctx context.Context, twitId int64, userId int) (string, error)
 	DeleteTwit(ctx context.Context, twitId int64, userId int) error
 }
@@ -32,10 +31,11 @@ func TwitList(gRPC *grpc.Server, listTwit ListTwit) {
 
 func (s *serverAPI) CreateTwit(ctx context.Context, req *ssov1.CreateTwitRequest) (*ssov1.Message, error) {
 	userId, err := userIdentity(ctx)
+
 	if err != nil {
 		return nil, err
 	}
-	var input entity.Twit
+	var input ssov1.CreateTwitRequest
 
 	data, err := proto.Marshal(req)
 	if err != nil {
@@ -60,19 +60,8 @@ func (s *serverAPI) GetTwit(ctx context.Context, req *ssov1.GetTwitRequest) (*ss
 	if err != nil {
 		return nil, err
 	}
-	var input entity.Twit
 
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	err = proto.Unmarshal(data, &input)
-	if err != nil {
-		return nil, err
-	}
-
-	l, err := s.listTwit.GetTwit(ctx, input.Id, userId)
+	l, err := s.listTwit.GetTwit(ctx, req.TwitId, userId)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
@@ -87,19 +76,8 @@ func (s *serverAPI) DeleteTwit(ctx context.Context, req *ssov1.DeleteTwitRequest
 	if err != nil {
 		return nil, err
 	}
-	var input entity.Twit
 
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	err = proto.Unmarshal(data, &input)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.listTwit.DeleteTwit(ctx, input.Id, userId)
+	err = s.listTwit.DeleteTwit(ctx, req.TwitId, userId)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
@@ -114,13 +92,12 @@ func userIdentity(ctx context.Context) (int, error) {
 
 	tokenString := md.Get("authorization")
 	tokenBearer := strings.Split(tokenString[0], " ")
-
 	if len(tokenBearer) != 2 {
 		return 0, errors.New("token empty")
 	}
 	userId, err := ParseToken(tokenBearer[1])
 	if err != nil {
-		return 0, errors.New("token empty")
+		return 0, err
 	}
 	return userId, nil
 }
@@ -140,6 +117,7 @@ func ParseToken(accessToken string) (int, error) {
 
 		return []byte(signingKey), nil
 	})
+
 	if err != nil {
 		return 0, err
 	}

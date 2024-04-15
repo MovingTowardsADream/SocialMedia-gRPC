@@ -7,6 +7,7 @@ import (
 	"test-gRPC/internal/read_config"
 	"test-gRPC/internal/service"
 	"test-gRPC/internal/storage"
+	"time"
 )
 
 type App struct {
@@ -27,7 +28,7 @@ func New(log *slog.Logger, config read_config.Config) *App {
 	if err != nil {
 		panic(err)
 	}
-	authService := service.NewAuth(log, storage, config.GRPC.TokenTLL)
+	authService := service.NewAuth(log, storage, 12*time.Hour)
 	twitsService := service.NewListTwit(log, storage)
 	grpcApp := grpcapp.New(log, authService, twitsService, config.GRPC.Port)
 

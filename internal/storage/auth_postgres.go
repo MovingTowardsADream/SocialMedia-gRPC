@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"test-gRPC/entity"
+	ssov1 "test-gRPC/protobuf"
 )
 
-func (s *Storage) CreateUser(ctx context.Context, user entity.User) (int64, error) {
+func (s *Storage) CreateUser(ctx context.Context, user ssov1.SignUpRequest) (int64, error) {
 	var id int64
 
 	query := fmt.Sprintf("INSERT INTO %s (email, username, password_hash) values($1, $2, $3) RETURNING id", usersTable)

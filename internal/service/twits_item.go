@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"log/slog"
-	"test-gRPC/entity"
+	ssov1 "test-gRPC/protobuf"
 )
 
 type ListTwit struct {
@@ -12,7 +12,7 @@ type ListTwit struct {
 }
 
 type TwitProcedure interface {
-	CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error)
+	CreateTwit(ctx context.Context, twit ssov1.CreateTwitRequest, userId int) (int64, error)
 	GetTwit(ctx context.Context, twitId int64, userId int) (string, error)
 	DeleteTwit(ctx context.Context, twitId int64, userId int) error
 }
@@ -24,7 +24,7 @@ func NewListTwit(log *slog.Logger, twtProc TwitProcedure) *ListTwit {
 	}
 }
 
-func (a *ListTwit) CreateTwit(ctx context.Context, twit entity.Twit, userId int) (int64, error) {
+func (a *ListTwit) CreateTwit(ctx context.Context, twit ssov1.CreateTwitRequest, userId int) (int64, error) {
 	return a.twtProc.CreateTwit(ctx, twit, userId)
 }
 func (a *ListTwit) GetTwit(ctx context.Context, twitId int64, userId int) (string, error) {

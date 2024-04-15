@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"log/slog"
 	"test-gRPC/entity"
+	ssov1 "test-gRPC/protobuf"
 	"time"
 )
 
@@ -27,7 +28,7 @@ type Auth struct {
 }
 
 type UserProcedure interface {
-	CreateUser(ctx context.Context, user entity.User) (int64, error)
+	CreateUser(ctx context.Context, user ssov1.SignUpRequest) (int64, error)
 	GetUser(ctx context.Context, email, password string) (entity.User, error)
 }
 
@@ -39,7 +40,7 @@ func NewAuth(log *slog.Logger, usrProc UserProcedure, tokenTLL time.Duration) *A
 	}
 }
 
-func (a *Auth) CreateUser(ctx context.Context, user entity.User) (int64, error) {
+func (a *Auth) CreateUser(ctx context.Context, user ssov1.SignUpRequest) (int64, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return a.usrProc.CreateUser(ctx, user)
 }
